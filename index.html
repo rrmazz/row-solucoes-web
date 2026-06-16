@@ -13,27 +13,27 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style type="text/tailwindcss">
     @theme {
-      --color-bg: #071826;
-      --color-bg-deep: #04111b;
-      --color-surface: #0e2435;
-      --color-text: #ecf8ff;
-      --color-text-secondary: #b7d2df;
-      --color-text-muted: #7fa5b8;
-      --color-accent-1: #9ee8ff;
-      --color-accent-2: #39c6f4;
-      --color-accent-3: #0f6b83;
-      --color-glass-bg: rgba(255,255,255,0.06);
-      --color-glass-border: rgba(158,232,255,0.12);
-      --color-vignette: rgba(0,0,0,0.42);
+      --color-bg:               #0d0820;
+      --color-bg-deep:          #070412;
+      --color-surface:          #1a1040;
+      --color-text:             #f0eaff;
+      --color-text-secondary:   #c4b5e8;
+      --color-text-muted:       #8b6fb5;
+      --color-accent-1:         #d8b4fe;
+      --color-accent-2:         #a855f7;
+      --color-accent-3:         #6d28d9;
+      --color-glass-bg:         rgba(255,255,255,0.05);
+      --color-glass-border:     rgba(216,180,254,0.14);
+      --color-vignette:         rgba(0,0,0,0.50);
       --font-display: 'DM Serif Display', Georgia, serif;
       --font-body: 'DM Sans', sans-serif;
     }
   </style>
   <style>
     :root {
-      --color-bg: #071826;
-      --color-text: #ecf8ff;
-      --glow-color-rgb: 158, 232, 255;
+      --color-bg: #0d0820;
+      --color-text: #f0eaff;
+      --glow-color-rgb: 216, 180, 254;
     }
 
     *,
@@ -46,28 +46,20 @@
     body {
       background: var(--color-bg);
       margin: 0;
-      /* ALTERADO: scroll vertical livre, sem overflow hidden */
       overflow-x: hidden;
       overflow-y: auto;
     }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      color: #ecf8ff;
+      color: #f0eaff;
     }
 
-    /* ALTERADO: .deck vira um container em fluxo normal */
     .deck {
       width: 100%;
       position: relative;
     }
 
-    /*
-      ALTERADO: .slide deixa de ser position:absolute com opacity:0
-      e passa a ser um elemento em fluxo normal (block), sempre visível.
-      min-height: 100vh mantém cada seção ocupando pelo menos a tela inteira.
-      display:flex + align-items:center centraliza o conteúdo verticalmente.
-    */
     .slide {
       position: relative;
       width: 100%;
@@ -77,11 +69,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      /* separador visual sutil entre seções */
-      border-bottom: 1px solid rgba(158, 232, 255, 0.06);
+      border-bottom: 1px solid rgba(216, 180, 254, 0.07);
     }
-
-    /* REMOVIDO: .slide.active — não existe mais sistema de slides ativos */
 
     .slide > .content {
       position: relative;
@@ -91,13 +80,6 @@
       padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3.2rem);
     }
 
-    /* REMOVIDO: .nav-controls, .nav-btn, .slide-dots, .slide-counter */
-
-    /*
-      ALTERADO: .reveal agora começa invisível mas é ativado via
-      IntersectionObserver ao entrar no viewport durante o scroll.
-      A transição permanece idêntica ao original.
-    */
     .reveal {
       opacity: 0;
       transform: translateY(20px);
@@ -124,17 +106,9 @@
       animation: float-slow 12s ease-in-out infinite;
     }
 
-    .blob:nth-child(2) {
-      animation: float-drift 16s ease-in-out infinite;
-    }
-
-    .blob:nth-child(3) {
-      animation: float-slow 20s ease-in-out infinite reverse;
-    }
-
-    .blob:nth-child(4) {
-      animation: float-drift 18s ease-in-out infinite reverse;
-    }
+    .blob:nth-child(2) { animation: float-drift 16s ease-in-out infinite; }
+    .blob:nth-child(3) { animation: float-slow 20s ease-in-out infinite reverse; }
+    .blob:nth-child(4) { animation: float-drift 18s ease-in-out infinite reverse; }
 
     .slide::before {
       content: '';
@@ -142,8 +116,9 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background-image: linear-gradient(rgba(158, 232, 255, 0.04) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(158, 232, 255, 0.04) 1px, transparent 1px);
+      background-image:
+        linear-gradient(rgba(216, 180, 254, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(216, 180, 254, 0.04) 1px, transparent 1px);
       background-size: 48px 48px;
       opacity: 0.35;
     }
@@ -171,24 +146,24 @@
       font-size: 11px;
       letter-spacing: .14em;
       text-transform: uppercase;
-      color: #9ee8ff;
-      background: rgba(158, 232, 255, 0.08);
-      border: 1px solid rgba(158, 232, 255, 0.22);
+      color: #d8b4fe;
+      background: rgba(216, 180, 254, 0.08);
+      border: 1px solid rgba(216, 180, 254, 0.24);
       padding: 6px 12px;
       border-radius: 6px;
     }
 
     .grid-card {
-      background: rgba(14, 36, 53, 0.82);
-      border: 1px solid rgba(158, 232, 255, 0.14);
+      background: rgba(26, 16, 64, 0.85);
+      border: 1px solid rgba(216, 180, 254, 0.14);
       border-radius: 16px;
       padding: 1.1rem 1.15rem;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
     .metric-card {
-      background: linear-gradient(180deg, rgba(14, 36, 53, 0.95), rgba(7, 24, 38, 0.95));
-      border: 1px solid rgba(158, 232, 255, 0.14);
+      background: linear-gradient(180deg, rgba(26, 16, 64, 0.95), rgba(13, 8, 32, 0.95));
+      border: 1px solid rgba(216, 180, 254, 0.14);
       border-radius: 16px;
       padding: 1.2rem;
     }
@@ -201,8 +176,8 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      background: rgba(158, 232, 255, 0.08);
-      border: 1px solid rgba(158, 232, 255, 0.16);
+      background: rgba(216, 180, 254, 0.09);
+      border: 1px solid rgba(216, 180, 254, 0.18);
       margin-bottom: .8rem;
     }
 
@@ -219,8 +194,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #39c6f4;
-      box-shadow: 0 0 0 4px rgba(57, 198, 244, .12);
+      background: #a855f7;
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, .14);
     }
 
     .process-step::after {
@@ -230,12 +205,10 @@
       top: 1rem;
       bottom: -1.4rem;
       width: 2px;
-      background: rgba(158, 232, 255, 0.12);
+      background: rgba(216, 180, 254, 0.12);
     }
 
-    .process-step:last-child::after {
-      display: none;
-    }
+    .process-step:last-child::after { display: none; }
 
     .bar-track {
       width: 100%;
@@ -243,15 +216,14 @@
       background: rgba(255, 255, 255, 0.06);
       border-radius: 999px;
       overflow: hidden;
-      border: 1px solid rgba(158, 232, 255, 0.1);
+      border: 1px solid rgba(216, 180, 254, 0.10);
     }
 
     .bar-fill {
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #0f6b83, #9ee8ff);
+      background: linear-gradient(90deg, #6d28d9, #d8b4fe);
       width: 0%;
-      /* ALTERADO: transição controlada pelo JS via IntersectionObserver */
       transition: width 0.8s ease;
     }
 
@@ -260,12 +232,12 @@
       height: 124px;
       margin: 0 auto 1.2rem;
       border-radius: 28px;
-      background: linear-gradient(135deg, rgba(158, 232, 255, 0.22), rgba(15, 107, 131, 0.32));
-      border: 1px solid rgba(158, 232, 255, 0.28);
+      background: linear-gradient(135deg, rgba(216, 180, 254, 0.20), rgba(109, 40, 217, 0.30));
+      border: 1px solid rgba(216, 180, 254, 0.30);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+      box-shadow: 0 24px 80px rgba(109, 40, 217, 0.28);
     }
 
     .hero-mark span {
@@ -274,7 +246,7 @@
 
     .mini {
       font-size: 12px;
-      color: #7fa5b8;
+      color: #8b6fb5;
     }
 
     @keyframes float-slow {
@@ -304,17 +276,13 @@
       }
     }
 
-    /* Responsividade para mobile */
     @media (max-width: 768px) {
-      .slide > .content {
-        padding: 2.5rem 1rem;
-      }
+      .slide > .content { padding: 2.5rem 1rem; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Spotlight de mouse -->
   <div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
 
   <div class="deck">
@@ -322,16 +290,15 @@
     <!-- SEÇÃO 1 - Hero -->
     <div class="slide" data-slide="1">
       <div class="gradient-mesh">
-        <div class="blob" style="width:520px;height:520px;top:-120px;right:-80px;background:var(--color-accent-1);opacity:.14"></div>
-        <div class="blob" style="width:340px;height:340px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:.14"></div>
-        <div class="blob" style="width:240px;height:240px;top:38%;left:18%;background:var(--color-accent-3);opacity:.12"></div>
-        <div class="blob" style="width:220px;height:220px;bottom:18%;right:18%;background:#114d63;opacity:.10"></div>
+        <div class="blob" style="width:520px;height:520px;top:-120px;right:-80px;background:#a855f7;opacity:.18"></div>
+        <div class="blob" style="width:340px;height:340px;bottom:-60px;left:-40px;background:#7c3aed;opacity:.15"></div>
+        <div class="blob" style="width:240px;height:240px;top:38%;left:18%;background:#4c1d95;opacity:.14"></div>
+        <div class="blob" style="width:220px;height:220px;bottom:18%;right:18%;background:#2e1065;opacity:.12"></div>
       </div>
       <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
       <div class="content text-center">
         <div class="hero-mark reveal" style="animation:float 3s ease-in-out infinite;">
           <img src="file2.png" alt="Row Soluções Web" style="width: 80px; height: 80px; object-fit: contain;" />
-         
         </div>
         <div class="eyebrow reveal">Apresentação corporativa</div>
         <h1 class="font-display text-[clamp(2.8rem,6vw,5.2rem)] font-normal tracking-tight mt-5 mb-3 reveal bg-linear-to-r from-accent-1 via-white to-accent-2 bg-clip-text text-transparent">
@@ -363,8 +330,8 @@
     <!-- SEÇÃO 2 - O que fazemos -->
     <div class="slide" data-slide="2">
       <div class="gradient-mesh">
-        <div class="blob" style="width:360px;height:360px;top:-70px;right:-60px;background:var(--color-accent-1);opacity:.08"></div>
-        <div class="blob" style="width:260px;height:260px;bottom:-50px;left:-40px;background:var(--color-accent-2);opacity:.07"></div>
+        <div class="blob" style="width:360px;height:360px;top:-70px;right:-60px;background:#a855f7;opacity:.10"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-50px;left:-40px;background:#7c3aed;opacity:.09"></div>
       </div>
       <div class="content">
         <div class="eyebrow reveal">O que fazemos</div>
@@ -393,8 +360,8 @@
     <!-- SEÇÃO 3 - Frente 01 -->
     <div class="slide" data-slide="3">
       <div class="gradient-mesh">
-        <div class="blob" style="width:420px;height:420px;top:-110px;left:-60px;background:var(--color-accent-3);opacity:.09"></div>
-        <div class="blob" style="width:260px;height:260px;bottom:-40px;right:-40px;background:var(--color-accent-1);opacity:.08"></div>
+        <div class="blob" style="width:420px;height:420px;top:-110px;left:-60px;background:#6d28d9;opacity:.11"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-40px;right:-40px;background:#d8b4fe;opacity:.09"></div>
       </div>
       <div class="content">
         <div class="eyebrow reveal">Frente 01</div>
@@ -419,27 +386,21 @@
                   <span class="text-text-secondary">Clareza da oferta</span>
                   <span class="text-accent-1 font-bold">100%</span>
                 </div>
-                <div class="bar-track">
-                  <div class="bar-fill" data-width="100%"></div>
-                </div>
+                <div class="bar-track"><div class="bar-fill" data-width="100%"></div></div>
               </div>
               <div>
                 <div class="flex justify-between mb-2">
                   <span class="text-text-secondary">Canais digitais que a empresa pode ativar</span>
                   <span class="text-accent-1 font-bold">4+</span>
                 </div>
-                <div class="bar-track">
-                  <div class="bar-fill" data-width="82%"></div>
-                </div>
+                <div class="bar-track"><div class="bar-fill" data-width="82%"></div></div>
               </div>
               <div>
                 <div class="flex justify-between mb-2">
                   <span class="text-text-secondary">Etapas principais do funil digital</span>
                   <span class="text-accent-1 font-bold">3</span>
                 </div>
-                <div class="bar-track">
-                  <div class="bar-fill" data-width="68%"></div>
-                </div>
+                <div class="bar-track"><div class="bar-fill" data-width="68%"></div></div>
               </div>
             </div>
             <p class="mini mt-5">Esses números destacam estrutura e cobertura do serviço, sem prometer resultados que dependem do negócio, do tráfego e da operação do cliente.</p>
@@ -451,8 +412,8 @@
     <!-- SEÇÃO 4 - Frente 02 -->
     <div class="slide" data-slide="4">
       <div class="gradient-mesh">
-        <div class="blob" style="width:340px;height:340px;top:-90px;right:-50px;background:var(--color-accent-1);opacity:.08"></div>
-        <div class="blob" style="width:260px;height:260px;bottom:-30px;left:-30px;background:var(--color-accent-2);opacity:.08"></div>
+        <div class="blob" style="width:340px;height:340px;top:-90px;right:-50px;background:#a855f7;opacity:.10"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-30px;left:-30px;background:#7c3aed;opacity:.10"></div>
       </div>
       <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1"></canvas>
       <div class="content">
@@ -496,8 +457,8 @@
     <!-- SEÇÃO 5 - Frente 03 -->
     <div class="slide" data-slide="5">
       <div class="gradient-mesh">
-        <div class="blob" style="width:420px;height:420px;top:-120px;right:-50px;background:var(--color-accent-1);opacity:.08"></div>
-        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:-20px;background:var(--color-accent-3);opacity:.09"></div>
+        <div class="blob" style="width:420px;height:420px;top:-120px;right:-50px;background:#a855f7;opacity:.10"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:-20px;background:#6d28d9;opacity:.11"></div>
       </div>
       <div class="content">
         <div class="eyebrow reveal">Frente 03</div>
@@ -540,8 +501,8 @@
     <!-- SEÇÃO 6 - Crescimento -->
     <div class="slide" data-slide="6">
       <div class="gradient-mesh">
-        <div class="blob" style="width:350px;height:350px;top:-70px;left:-60px;background:var(--color-accent-2);opacity:.08"></div>
-        <div class="blob" style="width:280px;height:280px;bottom:-40px;right:-50px;background:var(--color-accent-1);opacity:.07"></div>
+        <div class="blob" style="width:350px;height:350px;top:-70px;left:-60px;background:#7c3aed;opacity:.10"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-40px;right:-50px;background:#d8b4fe;opacity:.09"></div>
       </div>
       <div class="content">
         <div class="eyebrow reveal">Crescimento</div>
@@ -573,9 +534,9 @@
     <!-- SEÇÃO 7 - Diferenciais -->
     <div class="slide" data-slide="7">
       <div class="gradient-mesh">
-        <div class="blob" style="width:500px;height:500px;top:-120px;right:-120px;background:var(--color-accent-1);opacity:.12"></div>
-        <div class="blob" style="width:320px;height:320px;bottom:-70px;left:-40px;background:var(--color-accent-2);opacity:.11"></div>
-        <div class="blob" style="width:220px;height:220px;top:45%;left:18%;background:var(--color-accent-3);opacity:.10"></div>
+        <div class="blob" style="width:500px;height:500px;top:-120px;right:-120px;background:#a855f7;opacity:.14"></div>
+        <div class="blob" style="width:320px;height:320px;bottom:-70px;left:-40px;background:#7c3aed;opacity:.13"></div>
+        <div class="blob" style="width:220px;height:220px;top:45%;left:18%;background:#6d28d9;opacity:.12"></div>
       </div>
       <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
       <div class="content">
@@ -615,9 +576,9 @@
     <!-- SEÇÃO 8 - Encerramento -->
     <div class="slide" data-slide="8">
       <div class="gradient-mesh">
-        <div class="blob" style="width:420px;height:420px;top:-110px;left:-70px;background:var(--color-accent-3);opacity:.1"></div>
-        <div class="blob" style="width:280px;height:280px;bottom:-50px;right:-60px;background:var(--color-accent-1);opacity:.1"></div>
-        <div class="blob" style="width:200px;height:200px;top:38%;right:22%;background:var(--color-accent-2);opacity:.08"></div>
+        <div class="blob" style="width:420px;height:420px;top:-110px;left:-70px;background:#6d28d9;opacity:.12"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-50px;right:-60px;background:#d8b4fe;opacity:.12"></div>
+        <div class="blob" style="width:200px;height:200px;top:38%;right:22%;background:#a855f7;opacity:.10"></div>
       </div>
       <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
       <div class="content text-center">
@@ -650,64 +611,29 @@
 
   </div><!-- /deck -->
 
-  <!--
-    REMOVIDO: bloco .nav-controls (botões, dots, contador)
-    O original tinha esse bloco comentado com /* */ dentro do HTML,
-    o que é HTML inválido. Foi simplesmente omitido aqui.
-  -->
-
   <script>
-    // ============================================================
-    // REMOVIDO: todo o sistema de navegação por slides
-    //   - goToSlide(), changeSlide(), updateNav()
-    //   - criação dinâmica de dots
-    //   - listener de teclado (ArrowLeft / ArrowRight / Space)
-    //   - listener de touchstart / touchend para swipe
-    //   - variáveis: current, total, dotsContainer, counter
-    // ============================================================
-
-    // ============================================================
-    // ALTERADO: animações de reveal
-    // Antes: disparadas manualmente ao trocar de slide (animateSlide)
-    // Agora: IntersectionObserver observa cada .reveal e aplica
-    //        .visible quando o elemento entra no viewport.
-    //        O delay escalonado por índice dentro da seção é mantido.
-    // ============================================================
     (function setupReveal() {
       const revealEls = document.querySelectorAll('.reveal');
-
-      // Agrupa reveals por seção para manter delay escalonado
       const slideMap = new Map();
       revealEls.forEach(el => {
         const slide = el.closest('.slide');
         if (!slideMap.has(slide)) slideMap.set(slide, []);
         slideMap.get(slide).push(el);
       });
-
-      // Atribui delay a cada elemento dentro de sua seção
       slideMap.forEach(els => {
-        els.forEach((el, i) => {
-          el.style.transitionDelay = `${i * 0.08}s`;
-        });
+        els.forEach((el, i) => { el.style.transitionDelay = `${i * 0.08}s`; });
       });
-
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
-            observer.unobserve(entry.target); // anima apenas uma vez
+            observer.unobserve(entry.target);
           }
         });
       }, { threshold: 0.15 });
-
       revealEls.forEach(el => observer.observe(el));
     })();
 
-    // ============================================================
-    // ALTERADO: barras de progresso (.bar-fill)
-    // Antes: animadas na troca de slide via animateSlideEffects()
-    // Agora: IntersectionObserver dispara quando a barra entra no viewport
-    // ============================================================
     (function setupBars() {
       const bars = document.querySelectorAll('.bar-fill');
       const observer = new IntersectionObserver((entries) => {
@@ -722,11 +648,6 @@
       bars.forEach(bar => observer.observe(bar));
     })();
 
-    // ============================================================
-    // ALTERADO: contadores numéricos ([data-count])
-    // Antes: disparados em animateSlideEffects() na troca de slide
-    // Agora: IntersectionObserver dispara ao entrar no viewport
-    // ============================================================
     (function setupCounters() {
       const counters = document.querySelectorAll('[data-count]');
       const observer = new IntersectionObserver((entries) => {
@@ -748,37 +669,25 @@
       counters.forEach(el => observer.observe(el));
     })();
 
-    // ============================================================
-    // MANTIDO: efeito de spotlight do mouse (sem alterações)
-    // ============================================================
     document.addEventListener('mousemove', (e) => {
       const spotlight = document.querySelector('.mouse-spotlight');
       if (spotlight) {
-        spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(158,232,255,0.06), transparent 40%)`;
+        spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(168,85,247,0.07), transparent 40%)`;
       }
     });
 
-    // ============================================================
-    // MANTIDO: sistema de partículas (sem alterações)
-    // ALTERADO: canvas agora precisa recalcular tamanho porque
-    //   os slides não ocupam mais toda a viewport de uma vez só.
-    //   ResizeObserver garante que o canvas acompanhe a seção.
-    // ============================================================
     window.initParticles = function(canvas, options) {
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-
       function resize() {
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
       }
       resize();
       new ResizeObserver(resize).observe(canvas);
-
       const interactive = options.interactive !== false;
       const count = options.count || (interactive ? 55 : 18);
       let mx = -1000, my = -1000;
-
       const particles = Array.from({ length: count }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -787,7 +696,6 @@
         size: Math.random() * 2.5 + 0.8,
         alpha: Math.random() * 0.35 + 0.1
       }));
-
       if (interactive) {
         canvas.addEventListener('mousemove', (e) => {
           const rect = canvas.getBoundingClientRect();
@@ -796,7 +704,6 @@
         });
         canvas.addEventListener('mouseleave', () => { mx = -1000; my = -1000; });
       }
-
       (function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach(p => {
@@ -817,7 +724,7 @@
           if (p.y > canvas.height) p.y = 0;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(158,232,255,${p.alpha})`;
+          ctx.fillStyle = `rgba(216,180,254,${p.alpha})`;
           ctx.fill();
         });
         requestAnimationFrame(animate);
@@ -830,12 +737,6 @@
     document.querySelectorAll('.particle-canvas-ambient').forEach(c =>
       window.initParticles(c, { interactive: false, count: 18 })
     );
-
-    // ============================================================
-    // REMOVIDO: animateSlide() e animateSlideEffects()
-    //   Essas funções eram chamadas na troca de slide e não fazem
-    //   sentido no modelo de scroll. Substituídas pelos observers.
-    // ============================================================
   </script>
 </body>
 </html>
