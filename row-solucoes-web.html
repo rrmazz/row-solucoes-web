@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Row Soluções Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #071826;
+      --color-bg-deep: #04111b;
+      --color-surface: #0e2435;
+      --color-text: #ecf8ff;
+      --color-text-secondary: #b7d2df;
+      --color-text-muted: #7fa5b8;
+      --color-accent-1: #9ee8ff;
+      --color-accent-2: #39c6f4;
+      --color-accent-3: #0f6b83;
+      --color-glass-bg: rgba(255,255,255,0.06);
+      --color-glass-border: rgba(158,232,255,0.12);
+      --color-vignette: rgba(0,0,0,0.42);
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+  </style>
+  <style>
+    :root {
+      --color-bg: #071826;
+      --color-text: #ecf8ff;
+      --glow-color-rgb: 158, 232, 255;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      background: var(--color-bg);
+      margin: 0;
+      /* ALTERADO: scroll vertical livre, sem overflow hidden */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: #ecf8ff;
+    }
+
+    /* ALTERADO: .deck vira um container em fluxo normal */
+    .deck {
+      width: 100%;
+      position: relative;
+    }
+
+    /*
+      ALTERADO: .slide deixa de ser position:absolute com opacity:0
+      e passa a ser um elemento em fluxo normal (block), sempre visível.
+      min-height: 100vh mantém cada seção ocupando pelo menos a tela inteira.
+      display:flex + align-items:center centraliza o conteúdo verticalmente.
+    */
+    .slide {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* separador visual sutil entre seções */
+      border-bottom: 1px solid rgba(158, 232, 255, 0.06);
+    }
+
+    /* REMOVIDO: .slide.active — não existe mais sistema de slides ativos */
+
+    .slide > .content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1180px;
+      padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3.2rem);
+    }
+
+    /* REMOVIDO: .nav-controls, .nav-btn, .slide-dots, .slide-counter */
+
+    /*
+      ALTERADO: .reveal agora começa invisível mas é ativado via
+      IntersectionObserver ao entrar no viewport durante o scroll.
+      A transição permanece idêntica ao original.
+    */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gradient-mesh {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: float-slow 12s ease-in-out infinite;
+    }
+
+    .blob:nth-child(2) {
+      animation: float-drift 16s ease-in-out infinite;
+    }
+
+    .blob:nth-child(3) {
+      animation: float-slow 20s ease-in-out infinite reverse;
+    }
+
+    .blob:nth-child(4) {
+      animation: float-drift 18s ease-in-out infinite reverse;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(158, 232, 255, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(158, 232, 255, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.35;
+    }
+
+    .slide::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, var(--color-vignette) 100%);
+    }
+
+    .text-glow {
+      text-shadow: 0 0 20px rgba(var(--glow-color-rgb), 0.4), 0 0 40px rgba(var(--glow-color-rgb), 0.18);
+    }
+
+    .stat-glow {
+      text-shadow: 0 0 30px rgba(var(--glow-color-rgb), 0.55), 0 0 60px rgba(var(--glow-color-rgb), 0.2);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #9ee8ff;
+      background: rgba(158, 232, 255, 0.08);
+      border: 1px solid rgba(158, 232, 255, 0.22);
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    .grid-card {
+      background: rgba(14, 36, 53, 0.82);
+      border: 1px solid rgba(158, 232, 255, 0.14);
+      border-radius: 16px;
+      padding: 1.1rem 1.15rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .metric-card {
+      background: linear-gradient(180deg, rgba(14, 36, 53, 0.95), rgba(7, 24, 38, 0.95));
+      border: 1px solid rgba(158, 232, 255, 0.14);
+      border-radius: 16px;
+      padding: 1.2rem;
+    }
+
+    .icon-chip {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: rgba(158, 232, 255, 0.08);
+      border: 1px solid rgba(158, 232, 255, 0.16);
+      margin-bottom: .8rem;
+    }
+
+    .process-step {
+      position: relative;
+      padding-left: 1.2rem;
+    }
+
+    .process-step::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: .52rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #39c6f4;
+      box-shadow: 0 0 0 4px rgba(57, 198, 244, .12);
+    }
+
+    .process-step::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 1rem;
+      bottom: -1.4rem;
+      width: 2px;
+      background: rgba(158, 232, 255, 0.12);
+    }
+
+    .process-step:last-child::after {
+      display: none;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(158, 232, 255, 0.1);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0f6b83, #9ee8ff);
+      width: 0%;
+      /* ALTERADO: transição controlada pelo JS via IntersectionObserver */
+      transition: width 0.8s ease;
+    }
+
+    .hero-mark {
+      width: 124px;
+      height: 124px;
+      margin: 0 auto 1.2rem;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(158, 232, 255, 0.22), rgba(15, 107, 131, 0.32));
+      border: 1px solid rgba(158, 232, 255, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+    }
+
+    .hero-mark span {
+      font-size: 60px;
+    }
+
+    .mini {
+      font-size: 12px;
+      color: #7fa5b8;
+    }
+
+    @keyframes float-slow {
+      0%   { transform: translate(0, 0) scale(1) }
+      25%  { transform: translate(60px, -50px) scale(1.12) }
+      50%  { transform: translate(-40px, 40px) scale(.9) }
+      75%  { transform: translate(50px, 20px) scale(1.08) }
+      100% { transform: translate(0, 0) scale(1) }
+    }
+
+    @keyframes float-drift {
+      0%   { transform: translate(0, 0) scale(1) rotate(0deg) }
+      33%  { transform: translate(-50px, -60px) scale(1.15) rotate(3deg) }
+      66%  { transform: translate(40px, 30px) scale(.88) rotate(-2deg) }
+      100% { transform: translate(0, 0) scale(1) rotate(0deg) }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) }
+      50%       { transform: translateY(-15px) }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+    }
+
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .slide > .content {
+        padding: 2.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Spotlight de mouse -->
+  <div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
+
+  <div class="deck">
+
+    <!-- SEÇÃO 1 - Hero -->
+    <div class="slide" data-slide="1">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:520px;height:520px;top:-120px;right:-80px;background:var(--color-accent-1);opacity:.14"></div>
+        <div class="blob" style="width:340px;height:340px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:.14"></div>
+        <div class="blob" style="width:240px;height:240px;top:38%;left:18%;background:var(--color-accent-3);opacity:.12"></div>
+        <div class="blob" style="width:220px;height:220px;bottom:18%;right:18%;background:#114d63;opacity:.10"></div>
+      </div>
+      <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
+      <div class="content text-center">
+        <div class="hero-mark reveal" style="animation:float 3s ease-in-out infinite;">
+          <img src="file2.png" alt="Row Soluções Web" style="width: 80px; height: 80px; object-fit: contain;" />
+         
+        </div>
+        <div class="eyebrow reveal">Apresentação corporativa</div>
+        <h1 class="font-display text-[clamp(2.8rem,6vw,5.2rem)] font-normal tracking-tight mt-5 mb-3 reveal bg-linear-to-r from-accent-1 via-white to-accent-2 bg-clip-text text-transparent">
+          Row Soluções Web
+        </h1>
+        <p class="text-[clamp(1rem,1.7vw,1.35rem)] text-text-secondary max-w-[760px] mx-auto leading-relaxed reveal">
+          Soluções digitais claras, bonitas e funcionais para empresas venderem mais, se apresentarem melhor e operarem com mais eficiência.
+        </p>
+        <div class="grid grid-cols-3 gap-4 mt-8 max-w-[900px] mx-auto">
+          <div class="metric-card reveal">
+            <div class="mini uppercase tracking-[.14em]">Foco</div>
+            <div class="text-2xl font-bold text-accent-1 mt-2">Presença digital</div>
+            <div class="mini mt-2">Sites, e-commerce, portais e materiais corporativos.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="mini uppercase tracking-[.14em]">Entrega</div>
+            <div class="text-2xl font-bold text-accent-1 mt-2">Visual + função</div>
+            <div class="mini mt-2">Design profissional com estrutura pensada para conversão.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="mini uppercase tracking-[.14em]">Valor</div>
+            <div class="text-2xl font-bold text-accent-1 mt-2">Mais confiança</div>
+            <div class="mini mt-2">Materiais e ativos que fortalecem imagem e vendas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 2 - O que fazemos -->
+    <div class="slide" data-slide="2">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:360px;height:360px;top:-70px;right:-60px;background:var(--color-accent-1);opacity:.08"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-50px;left:-40px;background:var(--color-accent-2);opacity:.07"></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow reveal">O que fazemos</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3.1rem)] mt-3 mb-3 reveal">Serviços que ajudam a empresa a vender, organizar e comunicar melhor</h2>
+        <p class="text-text-secondary text-lg max-w-[850px] mb-8 reveal">A Row Soluções Web atua em três frentes simples de entender: presença digital, materiais de comunicação e apoio estratégico para produtos e operação.</p>
+        <div class="grid grid-cols-3 gap-5">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🌐</div>
+            <h3 class="text-xl font-bold mb-2">Presença digital</h3>
+            <p class="text-text-secondary">Sites institucionais, one page, landing pages, perfis profissionais, lojas virtuais e portais com pagamento.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🎨</div>
+            <h3 class="text-xl font-bold mb-2">Comunicação visual</h3>
+            <p class="text-text-secondary">Logomarcas, manual de marca, folders, flyers, cartões, catálogos e apresentações corporativas.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">📊</div>
+            <h3 class="text-xl font-bold mb-2">Inteligência e suporte</h3>
+            <p class="text-text-secondary">Dashboards, relatórios executivos, geração de leads, conteúdo, documentos úteis e consultoria em produtos digitais.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 3 - Frente 01 -->
+    <div class="slide" data-slide="3">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:420px;height:420px;top:-110px;left:-60px;background:var(--color-accent-3);opacity:.09"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-40px;right:-40px;background:var(--color-accent-1);opacity:.08"></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow reveal">Frente 01</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3rem)] mt-3 mb-7 reveal">Sites e plataformas que transformam visita em oportunidade</h2>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🧩</div>
+            <h3 class="text-2xl font-bold mb-3">Soluções digitais</h3>
+            <ul class="space-y-3 text-text-secondary text-[1.02rem] leading-relaxed">
+              <li>• Web sites institucionais, one page e landing pages.</li>
+              <li>• Briefings e perfis profissionais com apresentação mais forte.</li>
+              <li>• Lojas virtuais pensadas para catálogo, jornada e conversão.</li>
+              <li>• Portais com integração com meios de pagamento.</li>
+            </ul>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">⚡</div>
+            <h3 class="text-2xl font-bold mb-3">Por que isso importa</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-text-secondary">Clareza da oferta</span>
+                  <span class="text-accent-1 font-bold">100%</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" data-width="100%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-text-secondary">Canais digitais que a empresa pode ativar</span>
+                  <span class="text-accent-1 font-bold">4+</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" data-width="82%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-text-secondary">Etapas principais do funil digital</span>
+                  <span class="text-accent-1 font-bold">3</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" data-width="68%"></div>
+                </div>
+              </div>
+            </div>
+            <p class="mini mt-5">Esses números destacam estrutura e cobertura do serviço, sem prometer resultados que dependem do negócio, do tráfego e da operação do cliente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 4 - Frente 02 -->
+    <div class="slide" data-slide="4">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:340px;height:340px;top:-90px;right:-50px;background:var(--color-accent-1);opacity:.08"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-30px;left:-30px;background:var(--color-accent-2);opacity:.08"></div>
+      </div>
+      <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1"></canvas>
+      <div class="content">
+        <div class="eyebrow reveal">Frente 02</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3rem)] mt-3 mb-7 reveal">Identidade visual e materiais que deixam a marca mais profissional</h2>
+        <div class="grid grid-cols-3 gap-5">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">✳️</div>
+            <h3 class="text-xl font-bold mb-2">Marca</h3>
+            <p class="text-text-secondary">Criação de logomarca e manual de marca para orientar uso correto de cores, tipografia e aplicações.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🗂️</div>
+            <h3 class="text-xl font-bold mb-2">Materiais gráficos</h3>
+            <p class="text-text-secondary">Folders, flyers, cartões, manuais, catálogos e peças úteis para vendas e relacionamento.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🖥️</div>
+            <h3 class="text-xl font-bold mb-2">Apresentações</h3>
+            <p class="text-text-secondary">Diagramação de apresentações corporativas claras, elegantes e fáceis de compreender.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🧠</div>
+            <h3 class="text-xl font-bold mb-2">Consistência</h3>
+            <p class="text-text-secondary">Uma marca coerente evita ruído visual e passa mais segurança em reuniões, propostas e redes sociais.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">📦</div>
+            <h3 class="text-xl font-bold mb-2">Kit útil</h3>
+            <p class="text-text-secondary">A empresa ganha um conjunto de ativos reutilizáveis para o time comercial, institucional e operacional.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🤝</div>
+            <h3 class="text-xl font-bold mb-2">Percepção</h3>
+            <p class="text-text-secondary">Quando a comunicação parece organizada, o cliente tende a sentir mais confiança antes mesmo da compra.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 5 - Frente 03 -->
+    <div class="slide" data-slide="5">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:420px;height:420px;top:-120px;right:-50px;background:var(--color-accent-1);opacity:.08"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:-20px;background:var(--color-accent-3);opacity:.09"></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow reveal">Frente 03</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3rem)] mt-3 mb-7 reveal">Relatórios, dashboards e documentos para decisões mais rápidas</h2>
+        <div class="grid grid-cols-4 gap-4 mb-6">
+          <div class="metric-card reveal">
+            <div class="icon-chip">📈</div>
+            <div class="text-4xl font-bold stat-glow text-accent-1">24h</div>
+            <div class="mini mt-2">Visão contínua possível em dashboards, diferente de relatórios soltos.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="icon-chip">🎯</div>
+            <div class="text-4xl font-bold stat-glow text-accent-1">1 tela</div>
+            <div class="mini mt-2">Executivos entendem melhor quando o essencial aparece de forma resumida.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="icon-chip">📝</div>
+            <div class="text-4xl font-bold stat-glow text-accent-1">3 usos</div>
+            <div class="mini mt-2">Apoio à decisão, prestação de contas e rotina operacional.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="icon-chip">🧾</div>
+            <div class="text-4xl font-bold stat-glow text-accent-1">6+</div>
+            <div class="mini mt-2">Tipos de documentos utilitários podem ser estruturados e padronizados.</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <h3 class="text-2xl font-bold mb-3">Entregas executivas</h3>
+            <p class="text-text-secondary leading-relaxed">Relatórios e dashboards visuais para diretoria, com foco em leitura rápida, destaque do que importa e melhor acompanhamento de indicadores.</p>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <h3 class="text-2xl font-bold mb-3">Documentos úteis</h3>
+            <p class="text-text-secondary leading-relaxed">Geradores de contratos, propostas, currículos, cartas de apresentação e outros documentos burocráticos que economizam tempo e reduzem retrabalho.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 6 - Crescimento -->
+    <div class="slide" data-slide="6">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:350px;height:350px;top:-70px;left:-60px;background:var(--color-accent-2);opacity:.08"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-40px;right:-50px;background:var(--color-accent-1);opacity:.07"></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow reveal">Crescimento</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3rem)] mt-3 mb-7 reveal">Conteúdo, leads e consultoria que ajudam o negócio a ganhar tração</h2>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🚀</div>
+            <h3 class="text-2xl font-bold mb-3">Aquisição e posicionamento</h3>
+            <ul class="space-y-3 text-text-secondary text-[1.02rem] leading-relaxed">
+              <li>• Geração de leads personalizados para o negócio.</li>
+              <li>• Geração de conteúdo e imagens para peças editoriais, roteiros e artigos.</li>
+              <li>• Materiais feitos para explicar melhor a oferta e apoiar campanhas.</li>
+            </ul>
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <div class="icon-chip">🧭</div>
+            <h3 class="text-2xl font-bold mb-3">Consultoria em produtos digitais</h3>
+            <div class="space-y-5 text-text-secondary">
+              <div class="process-step">Diagnóstico do desafio e do objetivo do negócio.</div>
+              <div class="process-step">Definição de solução digital mais adequada.</div>
+              <div class="process-step">Priorização do que gera valor primeiro.</div>
+              <div class="process-step">Organização da execução com clareza para o cliente.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 7 - Diferenciais -->
+    <div class="slide" data-slide="7">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-120px;right:-120px;background:var(--color-accent-1);opacity:.12"></div>
+        <div class="blob" style="width:320px;height:320px;bottom:-70px;left:-40px;background:var(--color-accent-2);opacity:.11"></div>
+        <div class="blob" style="width:220px;height:220px;top:45%;left:18%;background:var(--color-accent-3);opacity:.10"></div>
+      </div>
+      <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
+      <div class="content">
+        <div class="eyebrow reveal">Diferenciais</div>
+        <h2 class="font-display text-[clamp(2rem,4.2vw,3rem)] mt-3 mb-7 reveal">Números simples que ajudam o cliente a entender o valor</h2>
+        <div class="grid grid-cols-3 gap-5">
+          <div class="metric-card reveal">
+            <div class="icon-chip">🛠️</div>
+            <div class="text-5xl font-bold text-accent-1 stat-glow mb-2" data-count="11">11</div>
+            <div class="text-lg font-bold">Linhas de serviço</div>
+            <div class="mini mt-2">Cobertura ampla para presença digital, comunicação e operação.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="icon-chip">🔗</div>
+            <div class="text-5xl font-bold text-accent-1 stat-glow mb-2" data-count="3">3</div>
+            <div class="text-lg font-bold">Camadas de valor</div>
+            <div class="mini mt-2">Atrair, apresentar e organizar melhor o negócio.</div>
+          </div>
+          <div class="metric-card reveal">
+            <div class="icon-chip">📱</div>
+            <div class="text-5xl font-bold text-accent-1 stat-glow mb-2" data-count="4">4</div>
+            <div class="text-lg font-bold">Formatos centrais</div>
+            <div class="mini mt-2">Web, visual, dados e documentos.</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-6 mt-6">
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <strong class="text-accent-1">Clareza:</strong> uma empresa bem apresentada é mais fácil de entender, comparar e contratar.
+          </div>
+          <div class="grid-card reveal hover:-translate-y-1 hover:shadow-xl transition">
+            <strong class="text-accent-1">Escala:</strong> materiais padronizados e automações simples evitam retrabalho e aceleram entregas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 8 - Encerramento -->
+    <div class="slide" data-slide="8">
+      <div class="gradient-mesh">
+        <div class="blob" style="width:420px;height:420px;top:-110px;left:-70px;background:var(--color-accent-3);opacity:.1"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-50px;right:-60px;background:var(--color-accent-1);opacity:.1"></div>
+        <div class="blob" style="width:200px;height:200px;top:38%;right:22%;background:var(--color-accent-2);opacity:.08"></div>
+      </div>
+      <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1"></canvas>
+      <div class="content text-center">
+        <div class="hero-mark reveal" style="animation:float 3s ease-in-out infinite;">
+          <span>↗</span>
+        </div>
+        <div class="eyebrow reveal">Encerramento</div>
+        <h2 class="font-display text-[clamp(2.6rem,5vw,4.6rem)] mt-4 mb-4 reveal bg-linear-to-r from-accent-1 via-white to-accent-2 bg-clip-text text-transparent">
+          Soluções digitais para negócios que querem parecer grandes e operar melhor
+        </h2>
+        <p class="text-[1.15rem] text-text-secondary max-w-[820px] mx-auto leading-relaxed reveal">
+          A Row Soluções Web reúne design, estrutura, conteúdo e visão de negócio para transformar necessidades do dia a dia em ativos digitais mais claros, úteis e profissionais.
+        </p>
+        <div class="grid grid-cols-3 gap-4 mt-8 max-w-[920px] mx-auto">
+          <div class="grid-card reveal">
+            🌐 <strong class="text-accent-1">Presença</strong>
+            <div class="mini mt-2">Seu negócio mais visível e melhor explicado.</div>
+          </div>
+          <div class="grid-card reveal">
+            📊 <strong class="text-accent-1">Gestão</strong>
+            <div class="mini mt-2">Informação visual para decidir com mais rapidez.</div>
+          </div>
+          <div class="grid-card reveal">
+            🎨 <strong class="text-accent-1">Imagem</strong>
+            <div class="mini mt-2">Materiais que reforçam confiança e profissionalismo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+
+  <!--
+    REMOVIDO: bloco .nav-controls (botões, dots, contador)
+    O original tinha esse bloco comentado com /* */ dentro do HTML,
+    o que é HTML inválido. Foi simplesmente omitido aqui.
+  -->
+
+  <script>
+    // ============================================================
+    // REMOVIDO: todo o sistema de navegação por slides
+    //   - goToSlide(), changeSlide(), updateNav()
+    //   - criação dinâmica de dots
+    //   - listener de teclado (ArrowLeft / ArrowRight / Space)
+    //   - listener de touchstart / touchend para swipe
+    //   - variáveis: current, total, dotsContainer, counter
+    // ============================================================
+
+    // ============================================================
+    // ALTERADO: animações de reveal
+    // Antes: disparadas manualmente ao trocar de slide (animateSlide)
+    // Agora: IntersectionObserver observa cada .reveal e aplica
+    //        .visible quando o elemento entra no viewport.
+    //        O delay escalonado por índice dentro da seção é mantido.
+    // ============================================================
+    (function setupReveal() {
+      const revealEls = document.querySelectorAll('.reveal');
+
+      // Agrupa reveals por seção para manter delay escalonado
+      const slideMap = new Map();
+      revealEls.forEach(el => {
+        const slide = el.closest('.slide');
+        if (!slideMap.has(slide)) slideMap.set(slide, []);
+        slideMap.get(slide).push(el);
+      });
+
+      // Atribui delay a cada elemento dentro de sua seção
+      slideMap.forEach(els => {
+        els.forEach((el, i) => {
+          el.style.transitionDelay = `${i * 0.08}s`;
+        });
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target); // anima apenas uma vez
+          }
+        });
+      }, { threshold: 0.15 });
+
+      revealEls.forEach(el => observer.observe(el));
+    })();
+
+    // ============================================================
+    // ALTERADO: barras de progresso (.bar-fill)
+    // Antes: animadas na troca de slide via animateSlideEffects()
+    // Agora: IntersectionObserver dispara quando a barra entra no viewport
+    // ============================================================
+    (function setupBars() {
+      const bars = document.querySelectorAll('.bar-fill');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bar = entry.target;
+            bar.style.width = bar.dataset.width || '0%';
+            observer.unobserve(bar);
+          }
+        });
+      }, { threshold: 0.4 });
+      bars.forEach(bar => observer.observe(bar));
+    })();
+
+    // ============================================================
+    // ALTERADO: contadores numéricos ([data-count])
+    // Antes: disparados em animateSlideEffects() na troca de slide
+    // Agora: IntersectionObserver dispara ao entrar no viewport
+    // ============================================================
+    (function setupCounters() {
+      const counters = document.querySelectorAll('[data-count]');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.dataset.count);
+            let cur = 0;
+            const step = target / 32;
+            const timer = setInterval(() => {
+              cur += step;
+              if (cur >= target) { cur = target; clearInterval(timer); }
+              el.textContent = Math.round(cur).toLocaleString();
+            }, 28);
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.4 });
+      counters.forEach(el => observer.observe(el));
+    })();
+
+    // ============================================================
+    // MANTIDO: efeito de spotlight do mouse (sem alterações)
+    // ============================================================
+    document.addEventListener('mousemove', (e) => {
+      const spotlight = document.querySelector('.mouse-spotlight');
+      if (spotlight) {
+        spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(158,232,255,0.06), transparent 40%)`;
+      }
+    });
+
+    // ============================================================
+    // MANTIDO: sistema de partículas (sem alterações)
+    // ALTERADO: canvas agora precisa recalcular tamanho porque
+    //   os slides não ocupam mais toda a viewport de uma vez só.
+    //   ResizeObserver garante que o canvas acompanhe a seção.
+    // ============================================================
+    window.initParticles = function(canvas, options) {
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+      resize();
+      new ResizeObserver(resize).observe(canvas);
+
+      const interactive = options.interactive !== false;
+      const count = options.count || (interactive ? 55 : 18);
+      let mx = -1000, my = -1000;
+
+      const particles = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 2.5 + 0.8,
+        alpha: Math.random() * 0.35 + 0.1
+      }));
+
+      if (interactive) {
+        canvas.addEventListener('mousemove', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          mx = e.clientX - rect.left;
+          my = e.clientY - rect.top;
+        });
+        canvas.addEventListener('mouseleave', () => { mx = -1000; my = -1000; });
+      }
+
+      (function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          if (interactive) {
+            const dx = p.x - mx, dy = p.y - my;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120 && dist > 0) {
+              const force = (120 - dist) / 120 * 2;
+              p.vx += (dx / dist) * force * 0.1;
+              p.vy += (dy / dist) * force * 0.1;
+            }
+          }
+          p.vx *= 0.98; p.vy *= 0.98;
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(158,232,255,${p.alpha})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(animate);
+      })();
+    };
+
+    document.querySelectorAll('.particle-canvas').forEach(c =>
+      window.initParticles(c, { interactive: true, count: 55 })
+    );
+    document.querySelectorAll('.particle-canvas-ambient').forEach(c =>
+      window.initParticles(c, { interactive: false, count: 18 })
+    );
+
+    // ============================================================
+    // REMOVIDO: animateSlide() e animateSlideEffects()
+    //   Essas funções eram chamadas na troca de slide e não fazem
+    //   sentido no modelo de scroll. Substituídas pelos observers.
+    // ============================================================
+  </script>
+</body>
+</html>
